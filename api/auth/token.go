@@ -3,29 +3,31 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
-func CreateToken(userId uint32) (string, error) {
+func CreateToken(user_id uint32) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
-	claims["user_id"] = userId
-	claims["exp"] = time.Now().Add(time.Hour * 1).Unix()
+	claims["user_id"] = user_id
+	claims["exp"] = time.Now().Add(time.Hour * 1).Unix() //Token expires after 1 hour
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(os.Getenv("API_SECRET")))
+
 }
 
 func TokenValid(r *http.Request) error {
 	tokenString := ExtractToken(r)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(os.Getenv("API_SECRET")), nil
 	})
@@ -45,8 +47,8 @@ func ExtractToken(r *http.Request) string {
 		return token
 	}
 	bearerToken := r.Header.Get("Authorization")
-	if len(strings.Split(bearerToken, "")) == 2 {
-		return strings.Split(bearerToken, "")[1]
+	if len(strings.Split(bearerToken, " ")) == 2 {
+		return strings.Split(bearerToken, " ")[1]
 	}
 	return ""
 }
@@ -56,7 +58,7 @@ func ExtractTokenID(r *http.Request) (uint32, error) {
 	tokenString := ExtractToken(r)
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 		return []byte(os.Getenv("API_SECRET")), nil
 	})
@@ -74,11 +76,13 @@ func ExtractTokenID(r *http.Request) (uint32, error) {
 	return 0, nil
 }
 
+//Pretty display the claims licely in the terminal
 func Pretty(data interface{}) {
 	b, err := json.MarshalIndent(data, "", " ")
 	if err != nil {
 		log.Println(err)
 		return
 	}
+
 	fmt.Println(string(b))
 }

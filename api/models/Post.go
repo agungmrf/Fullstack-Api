@@ -2,10 +2,11 @@ package models
 
 import (
 	"errors"
-	"github.com/jinzhu/gorm"
 	"html"
 	"strings"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
 type Post struct {
@@ -30,13 +31,13 @@ func (p *Post) Prepare() {
 func (p *Post) Validate() error {
 
 	if p.Title == "" {
-		return errors.New("required Title")
+		return errors.New("Required Title")
 	}
 	if p.Content == "" {
-		return errors.New("required Content")
+		return errors.New("Required Content")
 	}
 	if p.AuthorID < 1 {
-		return errors.New("required Author")
+		return errors.New("Required Author")
 	}
 	return nil
 }
@@ -58,7 +59,7 @@ func (p *Post) SavePost(db *gorm.DB) (*Post, error) {
 
 func (p *Post) FindAllPosts(db *gorm.DB) (*[]Post, error) {
 	var err error
-	var posts []Post
+	posts := []Post{}
 	err = db.Debug().Model(&Post{}).Limit(100).Find(&posts).Error
 	if err != nil {
 		return &[]Post{}, err
@@ -112,7 +113,7 @@ func (p *Post) DeleteAPost(db *gorm.DB, pid uint64, uid uint32) (int64, error) {
 
 	if db.Error != nil {
 		if gorm.IsRecordNotFoundError(db.Error) {
-			return 0, errors.New("post not found")
+			return 0, errors.New("Post not found")
 		}
 		return 0, db.Error
 	}

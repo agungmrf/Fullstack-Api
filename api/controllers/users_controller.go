@@ -4,16 +4,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"fullstack/api/auth"
-	"fullstack/api/models"
-	"fullstack/api/responses"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"net/http"
 	"strconv"
+
+	"fullstack/api/auth"
+	"fullstack/api/models"
+	"fullstack/api/responses"
+	"fullstack/api/utils/formaterror"
+	"github.com/gorilla/mux"
 )
 
 func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
+
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		responses.ERROR(w, http.StatusUnprocessableEntity, err)
@@ -33,7 +36,9 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 	userCreated, err := user.SaveUser(server.DB)
 
 	if err != nil {
+
 		formattedError := formaterror.FormatError(err.Error())
+
 		responses.ERROR(w, http.StatusInternalServerError, formattedError)
 		return
 	}
@@ -42,7 +47,9 @@ func (server *Server) CreateUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) GetUsers(w http.ResponseWriter, r *http.Request) {
+
 	user := models.User{}
+
 	users, err := user.FindAllUsers(server.DB)
 	if err != nil {
 		responses.ERROR(w, http.StatusInternalServerError, err)
@@ -52,8 +59,9 @@ func (server *Server) GetUsers(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) GetUser(w http.ResponseWriter, r *http.Request) {
+
 	vars := mux.Vars(r)
-	uid, err := strconv.ParseInt(vars["id"], 10, 32)
+	uid, err := strconv.ParseUint(vars["id"], 10, 32)
 	if err != nil {
 		responses.ERROR(w, http.StatusBadRequest, err)
 		return
@@ -88,7 +96,7 @@ func (server *Server) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	tokenID, err := auth.ExtractTokenID(r)
 	if err != nil {
-		responses.ERROR(w, http.StatusUnauthorized, errors.New("unauthorized"))
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
 		return
 	}
 	if tokenID != uint32(uid) {
@@ -123,7 +131,7 @@ func (server *Server) DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 	tokenID, err := auth.ExtractTokenID(r)
 	if err != nil {
-		responses.ERROR(w, http.StatusUnauthorized, errors.New("unauthorized"))
+		responses.ERROR(w, http.StatusUnauthorized, errors.New("Unauthorized"))
 		return
 	}
 	if tokenID != 0 && tokenID != uint32(uid) {
