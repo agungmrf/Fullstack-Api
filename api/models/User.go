@@ -50,43 +50,43 @@ func (u *User) Validate(action string) error {
 	switch strings.ToLower(action) {
 	case "update":
 		if u.Nickname == "" {
-			return errors.New("Required Nickname")
+			return errors.New("required Nickname")
 		}
 		if u.Password == "" {
-			return errors.New("Required Password")
+			return errors.New("required Password")
 		}
 		if u.Email == "" {
-			return errors.New("Required Email")
+			return errors.New("required Email")
 		}
 		if err := checkmail.ValidateFormat(u.Email); err != nil {
-			return errors.New("Invalid Email")
+			return errors.New("invalid Email")
 		}
 
 		return nil
 	case "login":
 		if u.Password == "" {
-			return errors.New("Required Password")
+			return errors.New("required Password")
 		}
 		if u.Email == "" {
-			return errors.New("Required Email")
+			return errors.New("required Email")
 		}
 		if err := checkmail.ValidateFormat(u.Email); err != nil {
-			return errors.New("Invalid Email")
+			return errors.New("invalid Email")
 		}
 		return nil
 
 	default:
 		if u.Nickname == "" {
-			return errors.New("Required Nickname")
+			return errors.New("required Nickname")
 		}
 		if u.Password == "" {
-			return errors.New("Required Password")
+			return errors.New("required Password")
 		}
 		if u.Email == "" {
-			return errors.New("Required Email")
+			return errors.New("required Email")
 		}
 		if err := checkmail.ValidateFormat(u.Email); err != nil {
-			return errors.New("Invalid Email")
+			return errors.New("invalid Email")
 		}
 		return nil
 	}
@@ -119,7 +119,7 @@ func (u *User) FindUserByID(db *gorm.DB, uid uint32) (*User, error) {
 		return &User{}, err
 	}
 	if gorm.IsRecordNotFoundError(err) {
-		return &User{}, errors.New("User Not Found")
+		return &User{}, errors.New("user Not Found")
 	}
 	return u, err
 }

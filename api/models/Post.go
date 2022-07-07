@@ -31,13 +31,13 @@ func (p *Post) Prepare() {
 func (p *Post) Validate() error {
 
 	if p.Title == "" {
-		return errors.New("Required Title")
+		return errors.New("required Title")
 	}
 	if p.Content == "" {
-		return errors.New("Required Content")
+		return errors.New("required Content")
 	}
 	if p.AuthorID < 1 {
-		return errors.New("Required Author")
+		return errors.New("required Author")
 	}
 	return nil
 }
@@ -90,11 +90,17 @@ func (p *Post) FindPostByID(db *gorm.DB, pid uint64) (*Post, error) {
 	return p, nil
 }
 
-func (p *Post) UpdateAPost(db *gorm.DB) (*Post, error) {
+func (p *Post) UpdateAPost(db *gorm.DB, pid uint64) (*Post, error) {
 
 	var err error
-
-	err = db.Debug().Model(&Post{}).Where("id = ?", p.ID).Updates(Post{Title: p.Title, Content: p.Content, UpdatedAt: time.Now()}).Error
+	db = db.Debug().Model(&Post{}).Where("id = ?", pid).Take(&Post{}).UpdateColumns(
+		map[string]interface{}{
+			"title":      p.Title,
+			"content":    p.Content,
+			"updated_at": time.Now(),
+		},
+	)
+	err = db.Debug().Model(&Post{}).Where("id = ?", pid).Take(&p).Error
 	if err != nil {
 		return &Post{}, err
 	}
@@ -113,7 +119,7 @@ func (p *Post) DeleteAPost(db *gorm.DB, pid uint64, uid uint32) (int64, error) {
 
 	if db.Error != nil {
 		if gorm.IsRecordNotFoundError(db.Error) {
-			return 0, errors.New("Post not found")
+			return 0, errors.New("post not found")
 		}
 		return 0, db.Error
 	}

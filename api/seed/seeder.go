@@ -9,13 +9,13 @@ import (
 
 var users = []models.User{
 	models.User{
-		Nickname: "Agung Ma'ruf",
-		Email:    "agungmaruf@gmail.com",
+		Nickname: "Steven victor",
+		Email:    "steven@gmail.com",
 		Password: "password",
 	},
 	models.User{
-		Nickname: "Ma'ruf Agung",
-		Email:    "1911500518@student.budiluhur.ac.id",
+		Nickname: "Martin Luther",
+		Email:    "luther@gmail.com",
 		Password: "password",
 	},
 }
